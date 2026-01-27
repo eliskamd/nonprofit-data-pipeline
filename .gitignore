@@ -1,22 +1,54 @@
 # Python
-venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 
-# Environment
-.env
+# Virtual Environments
+venv/
+.venv/
+env/
 
-# Data
+# UV Package Manager
+uv.lock
+
+# Environment Variables
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Database
+*.db
+*sqlite
+*.sqlite3
+
+# Data Files
 *.csv
 *.xlsx
+*.xls
 
 # IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Distribution / Build
+dist/
+build/
+*.egg-info/
