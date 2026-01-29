@@ -15,7 +15,7 @@ DataBridge helps nonprofits unify donor, volunteer, and campaign data from multi
 
 ## Project Status
 
-Currently in Week 1 of development
+Currently in Week 2 of development
 
 ## Author
 
