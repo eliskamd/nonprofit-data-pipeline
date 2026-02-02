@@ -71,35 +71,19 @@ Data Sources → ETL Pipeline → PostgreSQL → dbt → Dashboards
 ---
 ## How It Works
 
-┌────────────────┐
-│   CRM Data     │
-│  (DonorPerfect,│
-│  Salesforce)   │
-└──────┬─────────┘
-       │
-       ▼
-┌──────────────────┐
-│  ETL Pipeline    │
-│  (Python + SQL)  │
-└──────┬───────────┘
-       │
-       ▼
-┌──────────────────┐
-│   PostgreSQL     │
-│  Data Warehouse  │
-└──────┬───────────┘
-       │
-       ▼
-┌──────────────────┐
-│ dbt Transforms   │
-│ Business Logic   │
-└──────┬───────────┘
-       │
-       ▼
-┌──────────────────┐
-│    Dashboard     │
-│   (Streamlit)    │
-└──────────────────┘
+```mermaid
+flowchart TD
+    A[CRM DataDonorPerfect, Salesforce] --> B[ETL PipelinePython + SQL]
+    B --> C[PostgreSQLData Warehouse]
+    C --> D[dbt TransformsBusiness Logic]
+    D --> E[DashboardStreamlit]
+    
+    style A fill:#e1f5ff
+    style B fill:#fff4e1
+    style C fill:#e8f5e9
+    style D fill:#f3e5f5
+    style E fill:#fce4ec
+```
 
 ---
 
