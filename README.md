@@ -73,16 +73,19 @@ Data Sources → ETL Pipeline → PostgreSQL → dbt → Dashboards
 
 ```mermaid
 flowchart TD
-    A[CRM DataDonorPerfect, Salesforce] --> B[ETL PipelinePython + SQL]
-    B --> C[PostgreSQLData Warehouse]
-    C --> D[dbt TransformsBusiness Logic]
-    D --> E[DashboardStreamlit]
+    A[CRM Data Sources: DonorPerfect, Salesforce, etc.]
+    B[ETL Pipeline: Python + SQL]
+    C[PostgreSQL: Data Warehouse]
+    D[dbt Transformations: Business Logic]
+    E[Streamlit Dashboard: Self-Service Analytics]
     
-    style A fill:#e1f5ff
-    style B fill:#fff4e1
-    style C fill:#e8f5e9
-    style D fill:#f3e5f5
-    style E fill:#fce4ec
+    A --> B --> C --> D --> E
+    
+    style A fill:#b3d9ff,stroke:#0066cc,stroke-width:2px,color:#000000
+    style B fill:#ffe6b3,stroke:#cc8800,stroke-width:2px,color:#000000
+    style C fill:#b3ffb3,stroke:#00cc00,stroke-width:2px,color:#000000
+    style D fill:#e6b3ff,stroke:#9900cc,stroke-width:2px,color:#000000
+    style E fill:#ffb3d9,stroke:#cc0066,stroke-width:2px,color:#000000
 ```
 
 ---
