@@ -1,0 +1,84 @@
+# DataBridge - Nonprofit Data Pipeline
+# Portfolio Project
+
+## Project Context
+This is a data engineering pipeline consolidating nonprofit donor data:
+- Extract: CSV/API ingestion from CRMs (DonorPerfect, NeonCRM, Constant Contact)
+- Load: PostgreSQL normalized schema (3NF)
+- Transform: Future dbt models for analytics
+- Present: Future Streamlit dashboards
+
+Stack: Python 3.13, PostgreSQL 17, pandas, psycopg2, Faker (synthetic data)
+Package Manager: UV (not pip)
+Version Control: Git with feature branch workflow
+
+## Code Standards
+- Follow PEP 8 strictly
+- Use type hints for function signatures
+- Write docstrings (Google style) for all functions
+- DRY principle - no repeated code
+- Modular design - single responsibility per function/file
+- Production-ready error handling with logging
+
+## Database Standards
+- All table names lowercase with underscores
+- Foreign key relationships explicit
+- Indexes on frequently queried columns
+- No direct SQL strings - use parameterized queries
+- Connection management with context managers
+
+## Testing Requirements
+- Write pytest tests for all data generation functions
+- Validate data integrity before database loads
+- Test edge cases (null values, duplicates, invalid formats)
+- Run tests with: uv run pytest
+
+## Dependency Management (UV-Specific)
+- Dependencies managed via pyproject.toml with UV package manager
+- Production dependencies: faker, pandas, psycopg2-binary, sqlalchemy, python-dotenv
+- Dev dependencies: pytest, pytest-cov
+- ALWAYS use `uv add <package>` to add new dependencies
+- ALWAYS use `uv add --dev <package>` for development tools
+- Never manually edit pyproject.toml dependencies
+- Run `uv sync` after pulling changes that affect dependencies
+
+## Git Workflow (Already Established)
+- Use feature branches for all changes (never push to main directly)
+- Branch naming: feature/<description> (e.g., feature/add-api-integration)
+- Workflow: checkout branch → make changes → commit → push → PR → merge
+- Clean up after merge: `git checkout main && git pull && git branch -d feature/<name>`
+- Commit messages should be clear and descriptive
+
+## Security
+- Never commit credentials
+- Use environment variables (.env) for secrets
+- Generate synthetic data only (no PII)
+- Parameterize all database queries
+
+## Documentation
+- Update DATA_DICTIONARY.md when schema changes
+- Maintain ARCHITECTURE.md for design decisions
+- Comment complex business logic
+- Keep README current with setup instructions
+
+## Prohibited
+- No emojis in code
+- No hardcoded credentials
+- No SQL injection vectors
+- No untested database operations
+
+## Preferred Patterns
+- Use context managers for database connections
+- Implement logging over print statements
+- Prefer pandas for data manipulation
+- Use pathlib over os.path
+
+## Current Project State
+- Repository: https://github.com/eliskamd/nonprofit-data-pipeline
+- Python: 3.13+ (managed by UV)
+- Database: PostgreSQL 17 (local)
+- Main branch: main
+- Feature branch pattern established
+- 22 unit tests implemented with pytest
+- src/ library structure for reusable functions
+```
