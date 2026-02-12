@@ -148,7 +148,7 @@ flowchart TD
 Eliška Merchant-Dest
 - Building analytics infrastructure for global impact
 - Background: Mathematics, Environmental Science, Data Analysis
-- LinkedIn: [linkedin.com/in/eliskamd](https://www.linkedin.com/in/eliskamd)
+- LinkedIn: [linkedin.com/in/eliska-merchant-dest](https://www.linkedin.com/in/eliska-merchant-dest)
 - Portfolio: [eliskamerchantdest.com](https://eliskamerchantdest.com)
 - Email: e.merchantdest@gmail.com
 ```
