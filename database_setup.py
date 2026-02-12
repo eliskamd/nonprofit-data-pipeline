@@ -1,21 +1,32 @@
 """
 Database connection setup and table creation
 """
+import os
+
 import psycopg2
 from psycopg2 import sql
+from dotenv import load_dotenv
 
-# Database connection parameters
-DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5432,
-    'database': 'donorcrm_db',
-    'user': 'postgres',
-    'password': 'admin'
-}
+
+load_dotenv()
+
+
+def _build_db_config() -> dict[str, object]:
+    """Build psycopg2 connection args from environment variables."""
+    cfg: dict[str, object] = {
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": int(os.getenv("DB_PORT", "5432")),
+        "database": os.getenv("DB_NAME", "donorcrm_db"),
+        "user": os.getenv("DB_USER", "postgres"),
+    }
+    password = os.getenv("DB_PASSWORD", "").strip()
+    if password:
+        cfg["password"] = password
+    return cfg
 
 def get_connection():
     """Get database connection"""
-    return psycopg2.connect(**DB_CONFIG)
+    return psycopg2.connect(**_build_db_config())
 
 def create_tables():
     """Create database tables"""
@@ -74,14 +85,14 @@ def create_tables():
         conn = get_connection()
         cursor = conn.cursor()
         
-        print("🏗️  Creating database tables...")
+        print("Creating database tables...")
         print("=" * 50)
         
         # Execute the SQL
         cursor.execute(create_tables_sql)
         conn.commit()
         
-        print("✅ Tables created successfully!")
+        print("Tables created successfully!")
         
         # Verify tables were created
         cursor.execute("""
@@ -92,9 +103,9 @@ def create_tables():
         """)
         
         tables = cursor.fetchall()
-        print(f"\n📊 Tables in database:")
+        print("\nTables in database:")
         for table in tables:
-            print(f"   • {table[0]}")
+            print(f"   - {table[0]}")
         
         cursor.close()
         conn.close()
@@ -109,12 +120,12 @@ def test_connection():
     """Test database connection"""
     try:
         conn = get_connection()
-        print("✅ Successfully connected to PostgreSQL!")
+        print("Successfully connected to PostgreSQL!")
         
         cursor = conn.cursor()
         cursor.execute("SELECT version();")
         version = cursor.fetchone()
-        print(f"📊 PostgreSQL version: {version[0][:50]}...")
+        print(f"PostgreSQL version: {version[0][:50]}...")
         
         cursor.close()
         conn.close()
@@ -122,15 +133,15 @@ def test_connection():
         return True
         
     except Exception as e:
-        print(f"❌ Error connecting to database: {e}")
+        print(f"Error connecting to database: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🔌 Testing database connection...")
+    print("Testing database connection...")
     print("=" * 50)
     
     if test_connection():
         print("\n")
         create_tables()
     else:
-        print("⚠️  Fix connection issues before creating tables")
+        print("Fix connection issues before creating tables")

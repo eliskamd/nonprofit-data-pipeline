@@ -12,19 +12,19 @@ import os
 # Set seeds for reproducibility
 random.seed(42)
 
-print("🎉 Starting DataBridge data generation...")
+print("Starting DataBridge data generation...")
 print("=" * 50)
 
 # Create data directory
 os.makedirs('data/synthetic', exist_ok=True)
 
 # Generate donors
-print("\n📊 Generating 1,000 donor profiles...")
+print("\nGenerating 1,000 donor profiles...")
 donors = [generate_donor(i + 1, seed=42 + i) for i in range(1000)]
 df_donors = pd.DataFrame(donors)
 
 # Generate donations
-print("💰 Generating 5,000 donation records...")
+print("Generating 5,000 donation records...")
 donations = [
     generate_donation(
         donation_id=i + 1,
@@ -36,7 +36,7 @@ donations = [
 df_donations = pd.DataFrame(donations)
 
 # Generate campaigns
-print("📢 Generating 10 fundraising campaigns...")
+print("Generating 10 fundraising campaigns...")
 campaign_names = [
     'Annual Fund Drive', 'Fiscal Year End Appeal', 'Spring Gala',
     'School Supplies', 'Capital Campaign', 'Scholarship Drive',
@@ -50,27 +50,27 @@ campaigns = [
 df_campaigns = pd.DataFrame(campaigns)
 
 # Save datasets
-print("\n💾 Saving datasets to CSV files...")
+print("\nSaving datasets to CSV files...")
 df_donors.to_csv('data/synthetic/donors.csv', index=False)
 df_donations.to_csv('data/synthetic/donations.csv', index=False)
 df_campaigns.to_csv('data/synthetic/campaigns.csv', index=False)
 
 # Summary
 print("\n" + "=" * 50)
-print("✅ DATA GENERATION COMPLETE!")
+print("DATA GENERATION COMPLETE!")
 print("=" * 50)
-print(f"\n📊 Summary:")
-print(f"   • Donors: {len(df_donors):,}")
-print(f"   • Donations: {len(df_donations):,}")
-print(f"   • Campaigns: {len(df_campaigns)}")
-print(f"   • Total donation amount: ${df_donations['amount'].sum():,.2f}")
-print(f"   • Average donation: ${df_donations['amount'].mean():.2f}")
-print(f"   • Date range: {df_donations['donation_date'].min()} to {df_donations['donation_date'].max()}")
-print("\n📁 Files saved:")
-print("   • data/synthetic/donors.csv")
-print("   • data/synthetic/donations.csv")
-print("   • data/synthetic/campaigns.csv")
-print("\n🎯 Next steps:")
+print("\nSummary:")
+print(f"   - Donors: {len(df_donors):,}")
+print(f"   - Donations: {len(df_donations):,}")
+print(f"   - Campaigns: {len(df_campaigns)}")
+print(f"   - Total donation amount: ${df_donations['amount'].sum():,.2f}")
+print(f"   - Average donation: ${df_donations['amount'].mean():.2f}")
+print(f"   - Date range: {df_donations['donation_date'].min()} to {df_donations['donation_date'].max()}")
+print("\nFiles saved:")
+print("   - data/synthetic/donors.csv")
+print("   - data/synthetic/donations.csv")
+print("   - data/synthetic/campaigns.csv")
+print("\nNext steps:")
 print("   1. Review the generated data")
 print("   2. Set up PostgreSQL database")
 print("   3. Build ETL pipeline to load data")

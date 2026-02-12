@@ -19,6 +19,10 @@ Nonprofits struggle with donor data scattered across CRMs, email platforms, paym
 git clone https://github.com/eliskamd/nonprofit-data-pipeline.git
 cd nonprofit-data-pipeline
 
+# Create environment file (do not commit .env)
+copy .env.example .env  # Windows
+cp .env.example .env    # Mac/Linux
+
 # Set up Python environment
 python -m venv venv
 venv\Scripts\activate  # Windows
@@ -35,9 +39,23 @@ python database_setup.py
 
 # Load data
 python load_data.py
+
+# Create/refresh analytics views (for dashboard)
+python create_views.py
 ```
 
 **Result:** 6,010 records loaded into PostgreSQL, ready to query!
+
+### Data Intake Assistant (Streamlit)
+
+AI-assisted data intake UI: upload a CSV, see its structure, and chat with context about mappings and integrations.
+
+```bash
+# From project root (with UV)
+uv run streamlit run streamlit_app.py
+```
+
+Then open **http://localhost:8501** in your browser. For "Explain this data" and chat, set `OPENAI_API_KEY` in your environment or `.env`.
 
 ---
 

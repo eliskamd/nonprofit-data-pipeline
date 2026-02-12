@@ -1,27 +1,38 @@
 """
 Load CSV data into PostgreSQL database
 """
+import os
+
 import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_batch
 import sys
+from dotenv import load_dotenv
 
-# Database connection parameters
-DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5432,
-    'database': 'donorcrm_db',
-    'user': 'postgres',
-    'password': 'admin'
-}
+
+load_dotenv()
+
+
+def _build_db_config() -> dict[str, object]:
+    """Build psycopg2 connection args from environment variables."""
+    cfg: dict[str, object] = {
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": int(os.getenv("DB_PORT", "5432")),
+        "database": os.getenv("DB_NAME", "donorcrm_db"),
+        "user": os.getenv("DB_USER", "postgres"),
+    }
+    password = os.getenv("DB_PASSWORD", "").strip()
+    if password:
+        cfg["password"] = password
+    return cfg
 
 def get_connection():
     """Get database connection"""
-    return psycopg2.connect(**DB_CONFIG)
+    return psycopg2.connect(**_build_db_config())
 
 def load_donors():
     """Load donors from CSV to database"""
-    print("\n📊 Loading donors...")
+    print("\nLoading donors...")
     
     try:
         # Read CSV
@@ -58,19 +69,19 @@ def load_donors():
         # Verify count
         cursor.execute("SELECT COUNT(*) FROM donors")
         count = cursor.fetchone()[0]
-        print(f"   ✅ Loaded {count} donors into database")
+        print(f"   Loaded {count} donors into database")
         
         cursor.close()
         conn.close()
         return True
         
     except Exception as e:
-        print(f"   ❌ Error loading donors: {e}")
+        print(f"   Error loading donors: {e}")
         return False
 
 def load_campaigns():
     """Load campaigns from CSV to database"""
-    print("\n📢 Loading campaigns...")
+    print("\nLoading campaigns...")
     
     try:
         # Read CSV
@@ -106,19 +117,19 @@ def load_campaigns():
         # Verify count
         cursor.execute("SELECT COUNT(*) FROM campaigns")
         count = cursor.fetchone()[0]
-        print(f"   ✅ Loaded {count} campaigns into database")
+        print(f"   Loaded {count} campaigns into database")
         
         cursor.close()
         conn.close()
         return True
         
     except Exception as e:
-        print(f"   ❌ Error loading campaigns: {e}")
+        print(f"   Error loading campaigns: {e}")
         return False
 
 def load_donations():
     """Load donations from CSV to database"""
-    print("\n💰 Loading donations...")
+    print("\nLoading donations...")
     
     try:
         # Read CSV
@@ -154,19 +165,19 @@ def load_donations():
         # Verify count
         cursor.execute("SELECT COUNT(*) FROM donations")
         count = cursor.fetchone()[0]
-        print(f"   ✅ Loaded {count} donations into database")
+        print(f"   Loaded {count} donations into database")
         
         cursor.close()
         conn.close()
         return True
         
     except Exception as e:
-        print(f"   ❌ Error loading donations: {e}")
+        print(f"   Error loading donations: {e}")
         return False
 
 def verify_data():
     """Run some queries to verify data loaded correctly"""
-    print("\n🔍 Verifying data...")
+    print("\nVerifying data...")
     print("=" * 50)
     
     try:
@@ -183,20 +194,20 @@ def verify_data():
         cursor.execute("SELECT COUNT(*) FROM donations")
         donation_count = cursor.fetchone()[0]
         
-        print(f"📊 Record counts:")
-        print(f"   • Donors: {donor_count:,}")
-        print(f"   • Campaigns: {campaign_count}")
-        print(f"   • Donations: {donation_count:,}")
+        print("Record counts:")
+        print(f"   - Donors: {donor_count:,}")
+        print(f"   - Campaigns: {campaign_count}")
+        print(f"   - Donations: {donation_count:,}")
         
         # Total donation amount
         cursor.execute("SELECT SUM(amount) FROM donations")
         total_amount = cursor.fetchone()[0]
-        print(f"\n💵 Total donations: ${total_amount:,.2f}")
+        print(f"\nTotal donations: ${total_amount:,.2f}")
         
         # Average donation
         cursor.execute("SELECT AVG(amount) FROM donations")
         avg_amount = cursor.fetchone()[0]
-        print(f"💵 Average donation: ${avg_amount:.2f}")
+        print(f"Average donation: ${avg_amount:.2f}")
         
         # Sample donor with donations
         cursor.execute("""
@@ -213,9 +224,9 @@ def verify_data():
             LIMIT 5
         """)
         
-        print(f"\n🌟 Top 5 donors by total amount:")
+        print("\nTop 5 donors by total amount:")
         for row in cursor.fetchall():
-            print(f"   • {row[0]} {row[1]}: {row[2]} donations, ${row[3]:,.2f} total")
+            print(f"   - {row[0]} {row[1]}: {row[2]} donations, ${row[3]:,.2f} total")
         
         cursor.close()
         conn.close()
@@ -223,11 +234,11 @@ def verify_data():
         return True
         
     except Exception as e:
-        print(f"❌ Error verifying data: {e}")
+        print(f"Error verifying data: {e}")
         return False
 
 if __name__ == "__main__":
-    print("🚀 Starting data load process...")
+    print("Starting data load process...")
     print("=" * 50)
     
     # Load data in order (donors and campaigns first, then donations)
@@ -245,8 +256,8 @@ if __name__ == "__main__":
     if success:
         verify_data()
         print("\n" + "=" * 50)
-        print("✅ DATA LOAD COMPLETE!")
+        print("DATA LOAD COMPLETE!")
         print("=" * 50)
     else:
-        print("\n⚠️  Some data failed to load. Check errors above.")
+        print("\nSome data failed to load. Check errors above.")
         sys.exit(1)
