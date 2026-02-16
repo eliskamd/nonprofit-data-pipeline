@@ -7,6 +7,8 @@ from src.data_generator import (
     generate_donor,
     generate_donation,
     generate_campaign,
+    generate_portfolio_holder,
+    generate_portfolio_assignment,
     validate_donor,
     validate_donation
 )
@@ -84,6 +86,19 @@ class TestGenerateDonation:
         """Test that is_recurring is a boolean"""
         donation = generate_donation(donation_id=1, donor_id=1)
         assert isinstance(donation['is_recurring'], bool)
+
+    def test_campaign_id_none_when_allow_no_campaign(self):
+        """Test that donation can have no campaign when allow_no_campaign=True"""
+        donation = generate_donation(
+            donation_id=1, donor_id=1, campaign_id=None, allow_no_campaign=True, seed=42
+        )
+        assert donation['campaign_id'] is None
+
+    def test_campaign_id_random_when_none_and_not_allow_no_campaign(self):
+        """Test that campaign_id is assigned when allow_no_campaign=False (default)"""
+        donation = generate_donation(donation_id=1, donor_id=1, seed=42)
+        assert donation['campaign_id'] is not None
+        assert 1 <= donation['campaign_id'] <= 10
 
 class TestGenerateCampaign:
     """Tests for generate_campaign function"""
@@ -163,3 +178,51 @@ class TestValidateDonation:
         invalid_donation = generate_donation(donation_id=1, donor_id=1)
         invalid_donation['amount'] = 0
         assert validate_donation(invalid_donation) is False
+
+    def test_donation_without_campaign_is_valid(self):
+        """Test that donation with campaign_id None passes validation"""
+        donation = generate_donation(
+            donation_id=1, donor_id=1, campaign_id=None, allow_no_campaign=True, seed=42
+        )
+        assert donation['campaign_id'] is None
+        assert validate_donation(donation) is True
+
+
+class TestGeneratePortfolioHolder:
+    """Tests for generate_portfolio_holder function"""
+
+    def test_generates_all_required_fields(self):
+        """Test that portfolio holder has expected fields"""
+        holder = generate_portfolio_holder(holder_id=1, name="Jane Doe")
+        assert holder['portfolio_holder_id'] == 1
+        assert holder['name'] == "Jane Doe"
+        assert 'email' in holder
+
+    def test_name_random_when_none(self):
+        """Test that name is generated when not provided"""
+        holder = generate_portfolio_holder(holder_id=1, seed=42)
+        assert ' ' in holder['name']
+        assert len(holder['name']) > 0
+
+
+class TestGeneratePortfolioAssignment:
+    """Tests for generate_portfolio_assignment function"""
+
+    def test_generates_all_required_fields(self):
+        """Test that assignment has all expected fields"""
+        assignment = generate_portfolio_assignment(
+            assignment_id=1, donor_id=100, portfolio_holder_id=2, seed=42
+        )
+        assert assignment['assignment_id'] == 1
+        assert assignment['donor_id'] == 100
+        assert assignment['portfolio_holder_id'] == 2
+        assert 'assigned_date' in assignment
+
+    def test_assigned_date_matches_input(self):
+        """Test that explicit assigned_date is used"""
+        from datetime import date
+        d = date(2024, 6, 1)
+        assignment = generate_portfolio_assignment(
+            assignment_id=1, donor_id=1, portfolio_holder_id=1, assigned_date=d
+        )
+        assert assignment['assigned_date'] == d

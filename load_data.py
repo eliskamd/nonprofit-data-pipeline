@@ -148,10 +148,11 @@ def load_donations():
             ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         
-        # Convert DataFrame to list of tuples
+        # Convert DataFrame to list of tuples (campaign_id can be NaN for gifts without campaign)
         records = [
             (
-                row['donation_id'], row['donor_id'], row['campaign_id'],
+                row['donation_id'], row['donor_id'],
+                row['campaign_id'] if pd.notna(row['campaign_id']) else None,
                 row['amount'], row['donation_date'], row['payment_method'],
                 row['is_recurring']
             )
@@ -175,6 +176,67 @@ def load_donations():
         print(f"   Error loading donations: {e}")
         return False
 
+def load_portfolio_holders():
+    """Load portfolio holders from CSV to database"""
+    print("\nLoading portfolio holders...")
+    try:
+        df = pd.read_csv('data/synthetic/portfolio_holders.csv')
+        print(f"   Read {len(df)} portfolio holders from CSV")
+        conn = get_connection()
+        cursor = conn.cursor()
+        insert_sql = """
+            INSERT INTO portfolio_holders (
+                portfolio_holder_id, name, email
+            ) VALUES (%s, %s, %s)
+        """
+        records = [
+            (row['portfolio_holder_id'], row['name'], row['email'])
+            for _, row in df.iterrows()
+        ]
+        execute_batch(cursor, insert_sql, records, page_size=100)
+        conn.commit()
+        cursor.execute("SELECT COUNT(*) FROM portfolio_holders")
+        count = cursor.fetchone()[0]
+        print(f"   Loaded {count} portfolio holders into database")
+        cursor.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"   Error loading portfolio holders: {e}")
+        return False
+
+def load_portfolio_assignments():
+    """Load portfolio assignments from CSV to database"""
+    print("\nLoading portfolio assignments...")
+    try:
+        df = pd.read_csv('data/synthetic/portfolio_assignments.csv')
+        print(f"   Read {len(df)} portfolio assignments from CSV")
+        conn = get_connection()
+        cursor = conn.cursor()
+        insert_sql = """
+            INSERT INTO portfolio_assignments (
+                assignment_id, donor_id, portfolio_holder_id, assigned_date
+            ) VALUES (%s, %s, %s, %s)
+        """
+        records = [
+            (
+                row['assignment_id'], row['donor_id'],
+                row['portfolio_holder_id'], row['assigned_date']
+            )
+            for _, row in df.iterrows()
+        ]
+        execute_batch(cursor, insert_sql, records, page_size=100)
+        conn.commit()
+        cursor.execute("SELECT COUNT(*) FROM portfolio_assignments")
+        count = cursor.fetchone()[0]
+        print(f"   Loaded {count} portfolio assignments into database")
+        cursor.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"   Error loading portfolio assignments: {e}")
+        return False
+
 def verify_data():
     """Run some queries to verify data loaded correctly"""
     print("\nVerifying data...")
@@ -194,10 +256,22 @@ def verify_data():
         cursor.execute("SELECT COUNT(*) FROM donations")
         donation_count = cursor.fetchone()[0]
         
+        cursor.execute("SELECT COUNT(*) FROM portfolio_holders")
+        holder_count = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT COUNT(*) FROM portfolio_assignments")
+        assignment_count = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT COUNT(*) FROM donations WHERE campaign_id IS NULL")
+        gifts_no_campaign = cursor.fetchone()[0]
+        
         print("Record counts:")
         print(f"   - Donors: {donor_count:,}")
         print(f"   - Campaigns: {campaign_count}")
         print(f"   - Donations: {donation_count:,}")
+        print(f"   - Portfolio holders: {holder_count}")
+        print(f"   - Portfolio assignments: {assignment_count:,}")
+        print(f"   - Gifts without campaign: {gifts_no_campaign:,}")
         
         # Total donation amount
         cursor.execute("SELECT SUM(amount) FROM donations")
@@ -250,7 +324,13 @@ if __name__ == "__main__":
     if not load_campaigns():
         success = False
     
+    if success and not load_portfolio_holders():
+        success = False
+    
     if success and not load_donations():
+        success = False
+    
+    if success and not load_portfolio_assignments():
         success = False
     
     if success:

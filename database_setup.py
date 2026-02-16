@@ -34,6 +34,8 @@ def create_tables():
     # SQL to create tables
     create_tables_sql = """
     -- Drop tables if they exist (for clean slate)
+    DROP TABLE IF EXISTS portfolio_assignments CASCADE;
+    DROP TABLE IF EXISTS portfolio_holders CASCADE;
     DROP TABLE IF EXISTS donations CASCADE;
     DROP TABLE IF EXISTS campaigns CASCADE;
     DROP TABLE IF EXISTS donors CASCADE;
@@ -63,7 +65,7 @@ def create_tables():
         campaign_type VARCHAR(50)
     );
     
-    -- Create donations table
+    -- Create donations table (campaign_id nullable for gifts not tied to a campaign)
     CREATE TABLE donations (
         donation_id INTEGER PRIMARY KEY,
         donor_id INTEGER REFERENCES donors(donor_id),
@@ -74,11 +76,28 @@ def create_tables():
         is_recurring BOOLEAN
     );
     
+    -- Create portfolio holders table
+    CREATE TABLE portfolio_holders (
+        portfolio_holder_id INTEGER PRIMARY KEY,
+        name VARCHAR(255),
+        email VARCHAR(255)
+    );
+    
+    -- Create portfolio assignments table (donor assigned to fundraiser)
+    CREATE TABLE portfolio_assignments (
+        assignment_id INTEGER PRIMARY KEY,
+        donor_id INTEGER REFERENCES donors(donor_id),
+        portfolio_holder_id INTEGER REFERENCES portfolio_holders(portfolio_holder_id),
+        assigned_date DATE
+    );
+    
     -- Create indexes for better query performance
     CREATE INDEX idx_donations_donor ON donations(donor_id);
     CREATE INDEX idx_donations_campaign ON donations(campaign_id);
     CREATE INDEX idx_donations_date ON donations(donation_date);
     CREATE INDEX idx_donors_email ON donors(email);
+    CREATE INDEX idx_portfolio_assignments_donor ON portfolio_assignments(donor_id);
+    CREATE INDEX idx_portfolio_assignments_holder ON portfolio_assignments(portfolio_holder_id);
     """
     
     try:
